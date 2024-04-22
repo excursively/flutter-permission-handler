@@ -3,6 +3,7 @@ package com.baseflow.permissionhandler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -157,8 +158,13 @@ final class PermissionManager {
             Context context,
             @Nullable Activity activity) {
 
+        Log.d(PermissionConstants.LOG_TAG, "determinePermissionStatus -> " + permission);
+
         if (permission == PermissionConstants.PERMISSION_GROUP_NOTIFICATION) {
             return checkNotificationPermissionStatus(context);
+        }
+        if (permission == PermissionConstants.PERMISSION_GROUP_BLUETOOTH){
+            return checkBluetoothPermissionStatus(context);
         }
 
         final List<String> names = PermissionUtils.getManifestNames(context, permission);
@@ -179,6 +185,7 @@ final class PermissionManager {
 
         for (String name : names) {
             // Only handle them if the client app actually targets a API level greater than M.
+            Log.d(PermissionConstants.LOG_TAG, "name => " + name);
             if (targetsMOrHigher) {
                 if (permission == PermissionConstants.PERMISSION_GROUP_IGNORE_BATTERY_OPTIMIZATIONS) {
                     String packageName = context.getPackageName();
@@ -249,9 +256,23 @@ final class PermissionManager {
         NotificationManagerCompat manager = NotificationManagerCompat.from(context);
         boolean isGranted = manager.areNotificationsEnabled();
         if (isGranted) {
+            Log.d(PermissionConstants.LOG_TAG, "Notification is granted");
             return PermissionConstants.PERMISSION_STATUS_GRANTED;
         }
+        Log.d(PermissionConstants.LOG_TAG, "Notification is NOT granted");
         return PermissionConstants.PERMISSION_STATUS_DENIED;
+    }
+
+    private int checkBluetoothPermissionStatus(Context context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is granted");
+        }
+        else {
+            Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is NOT granted");
+            return PermissionConstants.PERMISSION_STATUS_DENIED;
+        }
+
+        return PermissionConstants.PERMISSION_STATUS_GRANTED;
     }
 
     @VisibleForTesting
@@ -325,6 +346,8 @@ final class PermissionManager {
             for (int i = 0; i < permissions.length; i++) {
                 final String permissionName = permissions[i];
 
+                Log.d(PermissionConstants.LOG_TAG, "PermissionManager => " + permissionName);
+
                 @PermissionConstants.PermissionGroup final int permission =
                         PermissionUtils.parseManifestName(permissionName);
 
@@ -370,6 +393,11 @@ final class PermissionManager {
                     }
 
                     requestResults.put(permission, permissionStatus);
+
+                } else if (permission == PermissionConstants.PERMISSION_GROUP_BLUETOOTH) {
+                    @PermissionConstants.PermissionStatus int permissionStatus =
+                            PermissionUtils.toPermissionStatus(this.activity, permissionName, result);
+
                 } else if (!requestResults.containsKey(permission)) {
                     requestResults.put(
                             permission,

@@ -61,6 +61,10 @@ public class PermissionUtils {
                 return PermissionConstants.PERMISSION_GROUP_ACCESS_MEDIA_LOCATION;
             case Manifest.permission.ACTIVITY_RECOGNITION:
                 return PermissionConstants.PERMISSION_GROUP_ACTIVITY_RECOGNITION;
+            case Manifest.permission.BLUETOOTH:
+            case Manifest.permission.BLUETOOTH_ADMIN:
+            case Manifest.permission.BLUETOOTH_ADVERTISE:
+                return PermissionConstants.PERMISSION_GROUP_BLUETOOTH;
             default:
                 return PermissionConstants.PERMISSION_GROUP_UNKNOWN;
         }
@@ -101,13 +105,31 @@ public class PermissionUtils {
 
             case PermissionConstants.PERMISSION_GROUP_LOCATION_WHEN_IN_USE:
             case PermissionConstants.PERMISSION_GROUP_LOCATION:
-                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_COARSE_LOCATION))
+                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    Log.e(PermissionConstants.LOG_TAG, "Adding ACCESS_COARSE_LOCATION");
                     permissionNames.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+                }
 
-                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_FINE_LOCATION))
+                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Log.e(PermissionConstants.LOG_TAG, "Adding ACCESS_FINE_LOCATION");
                     permissionNames.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                }
                 break;
 
+            case PermissionConstants.PERMISSION_GROUP_BLUETOOTH:
+                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.BLUETOOTH)) {
+                    Log.e(PermissionConstants.LOG_TAG, "Adding BLUETOOTH");
+                    permissionNames.add(Manifest.permission.BLUETOOTH);
+                }
+                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.BLUETOOTH_ADMIN)) {
+                    Log.e(PermissionConstants.LOG_TAG, "Adding BLUETOOTH_ADMIN");
+                    permissionNames.add(Manifest.permission.BLUETOOTH_ADMIN);
+                }
+                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.BLUETOOTH_ADVERTISE)) {
+                    Log.e(PermissionConstants.LOG_TAG, "Adding BLUETOOTH_ADVERTISE");
+                    permissionNames.add(Manifest.permission.BLUETOOTH_ADVERTISE);
+                }
+                break;
 
             case PermissionConstants.PERMISSION_GROUP_SPEECH:
             case PermissionConstants.PERMISSION_GROUP_MICROPHONE:
@@ -195,6 +217,10 @@ public class PermissionUtils {
                 break;
 
             case PermissionConstants.PERMISSION_GROUP_NOTIFICATION:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && hasPermissionInManifest(context, permissionNames, Manifest.permission.POST_NOTIFICATIONS))
+                    permissionNames.add(Manifest.permission.POST_NOTIFICATIONS);
+                break;
+
             case PermissionConstants.PERMISSION_GROUP_MEDIA_LIBRARY:
             case PermissionConstants.PERMISSION_GROUP_PHOTOS:
             case PermissionConstants.PERMISSION_GROUP_REMINDERS:

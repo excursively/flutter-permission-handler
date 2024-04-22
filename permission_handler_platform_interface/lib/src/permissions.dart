@@ -103,6 +103,8 @@ class Permission {
   /// The unknown only used for return type, never requested
   static const unknown = Permission._(20);
 
+  static const bluetooth = Permission._(21);
+
   /// Returns a list of all possible [PermissionGroup] values.
   static const List<Permission> values = <Permission>[
     calendar,
@@ -126,6 +128,7 @@ class Permission {
     accessMediaLocation,
     activityRecognition,
     unknown,
+    bluetooth,
   ];
 
   static const List<String> _names = <String>[
@@ -150,6 +153,7 @@ class Permission {
     'access_media_location',
     'activity_recognition',
     'unknown',
+    'bluetooth',
   ];
 
   @override
