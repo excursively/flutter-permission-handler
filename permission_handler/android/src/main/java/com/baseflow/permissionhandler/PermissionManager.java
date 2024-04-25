@@ -264,12 +264,30 @@ final class PermissionManager {
     }
 
     private int checkBluetoothPermissionStatus(Context context) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is granted");
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is granted");
+            }
+            else {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is NOT granted");
+                return PermissionConstants.PERMISSION_STATUS_DENIED;
+            }
         }
         else {
-            Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is NOT granted");
-            return PermissionConstants.PERMISSION_STATUS_DENIED;
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Admin is granted");
+            }
+            else {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Admin is NOT granted");
+                return PermissionConstants.PERMISSION_STATUS_DENIED;
+            }
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth is granted");
+            }
+            else {
+                Log.d(PermissionConstants.LOG_TAG, "Bluetooth is NOT granted");
+                return PermissionConstants.PERMISSION_STATUS_DENIED;
+            }
         }
 
         return PermissionConstants.PERMISSION_STATUS_GRANTED;
