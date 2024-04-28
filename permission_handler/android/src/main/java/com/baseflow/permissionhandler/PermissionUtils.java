@@ -109,11 +109,11 @@ public class PermissionUtils {
                     Log.e(PermissionConstants.LOG_TAG, "Adding ACCESS_COARSE_LOCATION");
                     permissionNames.add(Manifest.permission.ACCESS_COARSE_LOCATION);
                 }
-
-                if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    Log.e(PermissionConstants.LOG_TAG, "Adding ACCESS_FINE_LOCATION");
-                    permissionNames.add(Manifest.permission.ACCESS_FINE_LOCATION);
-                }
+                // buggy unrequested but added..
+                // if (hasPermissionInManifest(context, permissionNames, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //     Log.e(PermissionConstants.LOG_TAG, "Adding ACCESS_FINE_LOCATION");
+                //     permissionNames.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                // }
                 break;
 
             case PermissionConstants.PERMISSION_GROUP_BLUETOOTH:
