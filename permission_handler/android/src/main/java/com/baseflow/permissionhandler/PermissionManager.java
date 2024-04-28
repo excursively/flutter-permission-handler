@@ -158,13 +158,11 @@ final class PermissionManager {
             Context context,
             @Nullable Activity activity) {
 
-        Log.d(PermissionConstants.LOG_TAG, "determinePermissionStatus -> " + permission);
-
         if (permission == PermissionConstants.PERMISSION_GROUP_NOTIFICATION) {
-            return checkNotificationPermissionStatus(context);
+            return checkNotificationPermissionStatus(activity, context);
         }
         if (permission == PermissionConstants.PERMISSION_GROUP_BLUETOOTH){
-            return checkBluetoothPermissionStatus(context);
+            return checkBluetoothPermissionStatus(activity, context);
         }
 
         final List<String> names = PermissionUtils.getManifestNames(context, permission);
@@ -185,7 +183,6 @@ final class PermissionManager {
 
         for (String name : names) {
             // Only handle them if the client app actually targets a API level greater than M.
-            Log.d(PermissionConstants.LOG_TAG, "name => " + name);
             if (targetsMOrHigher) {
                 if (permission == PermissionConstants.PERMISSION_GROUP_IGNORE_BATTERY_OPTIMIZATIONS) {
                     String packageName = context.getPackageName();
@@ -252,41 +249,69 @@ final class PermissionManager {
         successCallback.onSuccess(ActivityCompat.shouldShowRequestPermissionRationale(activity, names.get(0)));
     }
 
-    private int checkNotificationPermissionStatus(Context context) {
+    private int checkNotificationPermissionStatus(Activity activity, Context context) {
         NotificationManagerCompat manager = NotificationManagerCompat.from(context);
         boolean isGranted = manager.areNotificationsEnabled();
         if (isGranted) {
-            Log.d(PermissionConstants.LOG_TAG, "Notification is granted");
             return PermissionConstants.PERMISSION_STATUS_GRANTED;
         }
-        Log.d(PermissionConstants.LOG_TAG, "Notification is NOT granted");
-        return PermissionConstants.PERMISSION_STATUS_DENIED;
+        else {
+            if (!PermissionUtils.getRequestedPermissionBefore(context, Manifest.permission.POST_NOTIFICATIONS)) {
+                return PermissionConstants.PERMISSION_STATUS_NOT_DETERMINED;
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                    PermissionUtils.isNeverAskAgainSelected(activity, Manifest.permission.POST_NOTIFICATIONS)) {
+                return PermissionConstants.PERMISSION_STATUS_NEVER_ASK_AGAIN;
+            } else {
+                return PermissionConstants.PERMISSION_STATUS_DENIED;
+            }
+        }
+
+
     }
 
-    private int checkBluetoothPermissionStatus(Context context) {
+    private int checkBluetoothPermissionStatus(Activity activity, Context context) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is granted");
+                // permission is ok
             }
             else {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Advertise is NOT granted");
-                return PermissionConstants.PERMISSION_STATUS_DENIED;
+                if (!PermissionUtils.getRequestedPermissionBefore(context, Manifest.permission.BLUETOOTH_ADVERTISE)) {
+                    return PermissionConstants.PERMISSION_STATUS_NOT_DETERMINED;
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        PermissionUtils.isNeverAskAgainSelected(activity, Manifest.permission.BLUETOOTH_ADVERTISE)) {
+                    return PermissionConstants.PERMISSION_STATUS_NEVER_ASK_AGAIN;
+                } else {
+                    return PermissionConstants.PERMISSION_STATUS_DENIED;
+                }
             }
         }
         else {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Admin is granted");
+                // permission is ok
             }
             else {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth Admin is NOT granted");
-                return PermissionConstants.PERMISSION_STATUS_DENIED;
+                if (!PermissionUtils.getRequestedPermissionBefore(context, Manifest.permission.BLUETOOTH_ADMIN)) {
+                    return PermissionConstants.PERMISSION_STATUS_NOT_DETERMINED;
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        PermissionUtils.isNeverAskAgainSelected(activity, Manifest.permission.BLUETOOTH_ADMIN)) {
+                    return PermissionConstants.PERMISSION_STATUS_NEVER_ASK_AGAIN;
+                } else {
+                    return PermissionConstants.PERMISSION_STATUS_DENIED;
+                }
             }
+
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth is granted");
+                // permission is ok
             }
             else {
-                Log.d(PermissionConstants.LOG_TAG, "Bluetooth is NOT granted");
-                return PermissionConstants.PERMISSION_STATUS_DENIED;
+                if (!PermissionUtils.getRequestedPermissionBefore(context, Manifest.permission.BLUETOOTH)) {
+                    return PermissionConstants.PERMISSION_STATUS_NOT_DETERMINED;
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        PermissionUtils.isNeverAskAgainSelected(activity, Manifest.permission.BLUETOOTH)) {
+                    return PermissionConstants.PERMISSION_STATUS_NEVER_ASK_AGAIN;
+                } else {
+                    return PermissionConstants.PERMISSION_STATUS_DENIED;
+                }
             }
         }
 
